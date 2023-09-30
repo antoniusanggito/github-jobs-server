@@ -1,5 +1,7 @@
 // const db = require("../models");
+const { generateToken } = require('../helpers/token');
 const pool = require('./../../db');
+const { successMessage, errorMessage, status } = require('./../helpers/status');
 
 exports.login = async (req, res) => {
   if (!req.body) {
@@ -9,19 +11,24 @@ exports.login = async (req, res) => {
     });
     return;
   }
-
   const { username, password } = req.body;
 
+  const getUserQuery = `
+    SELECT * FROM users 
+    WHERE username=$1;
+  `;
+  const values = [username];
+
   try {
-    const user = await pool.query('SELECT * FROM users WHERE username=$1;', [
-      username,
-    ]);
-    res.json(user.rows[0]);
+    const { rows } = await pool.query(getUserQuery, values);
+    const user = rows[0];
+    const token = generateToken(user.username);
+    successMessage.data = user;
+    successMessage.data.token = token;
+    return res.status(status.success).send(successMessage);
   } catch (error) {
     console.error(error.message);
-    res.status(500).send({
-      error: 'server_error',
-      error_description: 'Internal Server Error',
-    });
+    errorMessage.message = error.message;
+    res.status(status.error).send(errorMessage);
   }
 };

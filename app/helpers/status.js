@@ -8,7 +8,7 @@ const status = {
   bad: 400,
 };
 
-export default {
+module.exports = {
   successMessage,
   errorMessage,
   status,
