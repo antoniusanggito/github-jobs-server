@@ -1,11 +1,15 @@
 -- CREATE DATABASE
-CREATE DATABASE tournamence;
+CREATE DATABASE jwt;
 
 -- CREATE TABLES
 CREATE TABLE IF NOT EXISTS users(
-  username VARCHAR(30) PRIMARY KEY,
-  password VARCHAR(30) NOT NULL
+  username VARCHAR(100) PRIMARY KEY,
+  password VARCHAR(100) NOT NULL
 );
 
 -- INSERT DATAS EXAMPLE
-INSERT INTO users(username, password) VALUES('john', 'john123'), ('doe', 'doe123');
+INSERT INTO users(username, password) 
+VALUES('john', '$2b$10$tCwc2mb7Z1BMfpFRFyWvcuwGATJDtjIKWlQd9bIfRgfaupfxSwkDi'), ('doe', '$2b$10$XdGpz73dlTUFcPw8r3434uFZ5sG/Ylz9YwbgyAq75ZlQ3sTfTXFDW');
+
+-- DROP TABLES
+DROP TABLE users;

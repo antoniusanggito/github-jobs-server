@@ -1,31 +1,54 @@
 const { generateToken } = require('../helpers/token');
 const pool = require('./../../db');
 const { successMessage, errorMessage, status } = require('./../helpers/status');
+const bcrypt = require('bcrypt');
 
 exports.login = async (req, res) => {
   if (!req.body) {
     errorMessage.message = 'Credential invalid';
-    return res.status(status.unauthorized).send(errorMessage);
+    res.status(status.unauthorized).send(errorMessage);
+    return;
   }
   const { username, password } = req.body;
 
   // validate user
+  let user;
   const getUserQuery = `
-    SELECT username FROM users 
-    WHERE username=$1;
-  `;
+      SELECT * FROM users 
+      WHERE username=$1;
+    `;
   const values = [username];
-
   try {
     const { rows } = await pool.query(getUserQuery, values);
-    const user = rows[0];
-    const token = generateToken(user.username);
-    successMessage.data = user;
-    successMessage.data.token = token;
-    return res.status(status.success).send(successMessage);
+    user = rows[0];
   } catch (error) {
-    console.error(error.message);
-    errorMessage.message = 'Credential invalid';
+    console.error('Error query db:', error.message);
+    errorMessage.message = error.message;
     res.status(status.error).send(errorMessage);
+    return;
   }
+
+  if (!user) {
+    errorMessage.message = 'Username is invalid';
+    res.status(status.unauthorized).send(errorMessage);
+    return;
+  }
+
+  // validate password
+  bcrypt.compare(password, user.password, (err, ret) => {
+    if (err) {
+      errorMessage.message = 'Server error';
+      res.status(status.error).send(errorMessage);
+      return;
+    }
+    if (ret) {
+      const token = generateToken(user.username);
+      successMessage.data.username = user.username;
+      successMessage.data.token = token;
+      res.status(status.success).send(successMessage);
+    } else {
+      errorMessage.message = 'Password does not match';
+      res.status(status.unauthorized).send(errorMessage);
+    }
+  });
 };
