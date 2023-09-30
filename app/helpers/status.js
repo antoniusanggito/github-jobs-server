@@ -1,5 +1,12 @@
-const successMessage = { status: 'success', data: {} };
-const errorMessage = { status: 'error', message: '' };
+const successMessage = (data) => ({
+  status: 'success',
+  data: data,
+});
+const errorMessage = (message) => ({
+  status: 'error',
+  message: message,
+});
+
 const status = {
   success: 200,
   error: 500,

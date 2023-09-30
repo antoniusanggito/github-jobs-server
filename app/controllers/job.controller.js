@@ -10,12 +10,11 @@ exports.getAllJob = async (req, res) => {
       options
     );
     const data = await response.json();
-    successMessage.data = data;
-    res.status(status.success).send(successMessage);
+    const ret = successMessage(data);
+    res.status(status.success).send(ret);
   } catch (error) {
     console.error(error.message);
-    errorMessage.message = error.message;
-    res.status(status.error).send(errorMessage);
+    res.status(status.error).send(errorMessage(error.message));
   }
 };
 
@@ -31,17 +30,15 @@ exports.getDetailJob = async (req, res) => {
     data = await response.json();
   } catch (error) {
     console.error(error.message);
-    errorMessage.message = error.message;
-    res.status(status.error).send(errorMessage);
+    res.status(status.error).send(errorMessage(error.message));
     return;
   }
 
   // validate data if empty
   if (Object.keys(data).length === 0) {
-    errorMessage.message = 'Job not available';
-    res.status(status.notfound).send(errorMessage);
+    return res.status(status.notfound).send(errorMessage('Job not available'));
   } else {
-    successMessage.data = data;
-    res.status(status.success).send(successMessage);
+    const ret = successMessage(data);
+    return res.status(status.success).send(ret);
   }
 };

@@ -5,8 +5,7 @@ const bcrypt = require('bcrypt');
 
 exports.login = async (req, res) => {
   if (!req.body) {
-    errorMessage.message = 'Credential invalid';
-    res.status(status.unauthorized).send(errorMessage);
+    res.status(status.unauthorized).send(errorMessage('Credential invalid'));
     return;
   }
   const { username, password } = req.body;
@@ -22,33 +21,31 @@ exports.login = async (req, res) => {
     const { rows } = await pool.query(getUserQuery, values);
     user = rows[0];
   } catch (error) {
-    console.error('Error query db:', error.message);
-    errorMessage.message = error.message;
-    res.status(status.error).send(errorMessage);
+    console.error(error.message);
+    res.status(status.error).send(errorMessage(error.message));
     return;
   }
 
   if (!user) {
-    errorMessage.message = 'Username is invalid';
-    res.status(status.unauthorized).send(errorMessage);
+    res.status(status.unauthorized).send(errorMessage('Username is invalid'));
     return;
   }
 
   // validate password
-  bcrypt.compare(password, user.password, (err, ret) => {
+  bcrypt.compare(password, user.password, (err, data) => {
     if (err) {
-      errorMessage.message = 'Server error';
-      res.status(status.error).send(errorMessage);
+      res.status(status.error).send(errorMessage('Server error'));
       return;
     }
-    if (ret) {
+    if (data) {
       const token = generateToken(user.username);
-      successMessage.data.username = user.username;
-      successMessage.data.token = token;
-      res.status(status.success).send(successMessage);
+      const ret = successMessage({
+        username: user.username,
+        token,
+      });
+      res.status(status.success).send(ret);
     } else {
-      errorMessage.message = 'Password does not match';
-      res.status(status.unauthorized).send(errorMessage);
+      res.status(status.unauthorized).send(errorMessage('Password is invalid'));
     }
   });
 };
