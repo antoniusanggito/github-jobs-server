@@ -1,4 +1,3 @@
-// const db = require("../models");
 const { generateToken } = require('../helpers/token');
 const pool = require('./../../db');
 const { successMessage, errorMessage, status } = require('./../helpers/status');
@@ -13,6 +12,7 @@ exports.login = async (req, res) => {
   }
   const { username, password } = req.body;
 
+  // validate user
   const getUserQuery = `
     SELECT * FROM users 
     WHERE username=$1;

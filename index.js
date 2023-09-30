@@ -13,6 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 require('./app/routes/login.routes.js')(app);
+require('./app/routes/job.routes.js')(app);
 
 // start server, listen for requests
 const PORT = 8080;
