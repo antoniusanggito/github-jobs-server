@@ -1,5 +1,4 @@
 require('dotenv').config();
-const pool = require('../../db');
 const { successMessage, errorMessage, status } = require('../helpers/status');
 const { options } = require('./../helpers/options');
 
@@ -23,6 +22,8 @@ exports.getAllJob = async (req, res) => {
   if (description && description !== '') {
     filtered = filtered.filter((job) => {
       return (
+        job.title.toLowerCase().indexOf(description.toLowerCase()) !== -1 ||
+        job.company.toLowerCase().indexOf(description.toLowerCase()) !== -1 ||
         job.description.toLowerCase().indexOf(description.toLowerCase()) !== -1
       );
     });
@@ -40,9 +41,10 @@ exports.getAllJob = async (req, res) => {
     });
   }
 
-  filtered = filtered.slice((page - 1) * 5, page * 5);
+  // Set pagination 5 per page
+  filteredPage = filtered.slice((page - 1) * 5, page * 5);
 
-  const ret = successMessage(filtered);
+  const ret = successMessage({ total: filtered.length, jobs: filteredPage });
   res.status(status.success).send(ret);
 };
 
