@@ -4,7 +4,7 @@ const { successMessage, errorMessage, status } = require('../helpers/status');
 const { options } = require('./../helpers/options');
 
 exports.getAllJob = async (req, res) => {
-  const { description, location, full_time } = req.query;
+  const { description, location, full_time, page = 1 } = req.query;
 
   let data;
   try {
@@ -43,6 +43,8 @@ exports.getAllJob = async (req, res) => {
         : true;
     });
   }
+
+  filtered = filtered.slice((page - 1) * 5, page * 5);
 
   const ret = successMessage(filtered);
   res.status(status.success).send(ret);
