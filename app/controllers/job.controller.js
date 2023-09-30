@@ -20,7 +20,7 @@ exports.getAllJob = async (req, res) => {
   }
 
   let filtered = data;
-  if (description) {
+  if (description && description !== '') {
     filtered = filtered.filter((job) => {
       return (
         job.description.toLowerCase().indexOf(description.toLowerCase()) !== -1
@@ -28,19 +28,15 @@ exports.getAllJob = async (req, res) => {
     });
   }
 
-  if (location) {
+  if (location && location !== '') {
     filtered = filtered.filter((job) => {
       return job.location.toLowerCase().indexOf(location.toLowerCase()) !== -1;
     });
   }
 
-  if (full_time) {
+  if (full_time && full_time === 'true') {
     filtered = filtered.filter((job) => {
-      return full_time === 'true'
-        ? job.type === 'Full Time'
-        : full_time === 'false'
-        ? job.type !== 'Full Time'
-        : true;
+      return full_time === 'true';
     });
   }
 
