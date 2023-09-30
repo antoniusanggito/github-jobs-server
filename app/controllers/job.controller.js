@@ -11,7 +11,7 @@ exports.getAllJob = async (req, res) => {
     );
     const data = await response.json();
     successMessage.data = data;
-    return res.status(status.success).send(successMessage);
+    res.status(status.success).send(successMessage);
   } catch (error) {
     console.error(error.message);
     errorMessage.message = error.message;
@@ -22,24 +22,26 @@ exports.getAllJob = async (req, res) => {
 exports.getDetailJob = async (req, res) => {
   const { jobId } = req.params;
 
+  let data;
   try {
     const response = await fetch(
       `${process.env.API_URL}/positions/${jobId}`,
       options
     );
-    const data = await response.json();
-
-    // manual validate data is empty
-    if (Object.keys(data).length === 0) {
-      errorMessage.message = 'Job not found';
-      return res.status(status.notfound).send(errorMessage);
-    }
-
-    successMessage.data = data;
-    return res.status(status.success).send(successMessage);
+    data = await response.json();
   } catch (error) {
     console.error(error.message);
     errorMessage.message = error.message;
     res.status(status.error).send(errorMessage);
+    return;
+  }
+
+  // validate data if empty
+  if (Object.keys(data).length === 0) {
+    errorMessage.message = 'Job not available';
+    res.status(status.notfound).send(errorMessage);
+  } else {
+    successMessage.data = data;
+    res.status(status.success).send(successMessage);
   }
 };
