@@ -1,8 +1,8 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const { status } = require('./../helpers/status').default;
+const { status, errorMessage } = require('./../helpers/status');
 
-export default verifyToken = async (req, res, next) => {
+const verifyAuth = async (req, res, next) => {
   const { token } = req.headers;
   if (!token) {
     errorMessage.message = 'Token not provided';
@@ -20,3 +20,5 @@ export default verifyToken = async (req, res, next) => {
     return res.status(status.unauthorized).send(errorMessage);
   }
 };
+
+module.exports = verifyAuth;

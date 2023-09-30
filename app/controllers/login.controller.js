@@ -4,17 +4,14 @@ const { successMessage, errorMessage, status } = require('./../helpers/status');
 
 exports.login = async (req, res) => {
   if (!req.body) {
-    res.status(401).send({
-      error: 'invalid_request',
-      error_description: 'Invalid Request',
-    });
-    return;
+    errorMessage.message = 'Credential invalid';
+    return res.status(status.unauthorized).send(errorMessage);
   }
   const { username, password } = req.body;
 
   // validate user
   const getUserQuery = `
-    SELECT * FROM users 
+    SELECT username FROM users 
     WHERE username=$1;
   `;
   const values = [username];
@@ -28,7 +25,7 @@ exports.login = async (req, res) => {
     return res.status(status.success).send(successMessage);
   } catch (error) {
     console.error(error.message);
-    errorMessage.message = error.message;
+    errorMessage.message = 'Credential invalid';
     res.status(status.error).send(errorMessage);
   }
 };
