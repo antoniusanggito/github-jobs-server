@@ -3,9 +3,17 @@ const jwt = require('jsonwebtoken');
 const { status, errorMessage } = require('./../helpers/status');
 
 const verifyAuth = async (req, res, next) => {
-  const { token } = req.headers;
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.split(' ')[0] === 'Bearer'
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
   if (!token) {
-    return res.status(status.bad).send(errorMessage('Token not provided'));
+    res.status(status.unauthorized).send(errorMessage('Token is invalid'));
+    return;
   }
 
   try {
@@ -15,9 +23,8 @@ const verifyAuth = async (req, res, next) => {
     };
     next();
   } catch (error) {
-    return res
-      .status(status.unauthorized)
-      .send(errorMessage('Authentication Failed'));
+    res.status(status.unauthorized).send(errorMessage('Token is invalid'));
+    return;
   }
 };
 
