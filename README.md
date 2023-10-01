@@ -22,6 +22,6 @@ User can also click logout button after logged in.
 # install dependencies
 npm i
 
-# run server (at localhost:3000)
+# run server (at localhost:8080)
 node index.js
 ```
